@@ -1,5 +1,7 @@
 // Core
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
 // Instruments
 import Styles from './styles.m.css';
@@ -7,19 +9,49 @@ import { tasks } from './tasks';
 
 // Components
 import Task from '../Task';
+import Catcher from '../Catcher';
 import Checkbox from '../../theme/assets/Checkbox';
 
+// Actions
+import { tasksActions } from '../../core/tasks/actions';
+
+const mapState = (state) => {
+    return {
+        tasks: state.tasks,
+    };
+};
+
+const mapDispatch = (dispatch) => {
+    return {
+        actions: bindActionCreators({ ...tasksActions }, dispatch),
+    };
+};
+
+@connect(
+    mapState,
+    mapDispatch
+)
 export default class Scheduler extends Component {
+    componentDidMount () {
+        const { actions } = this.props;
+
+        actions.fetchTasksAsync();
+    }
+
     render () {
+        const { actions } = this.props;
+
         const todoList = tasks.map((task) => (
-            <Task
-                completed = { task.completed }
-                favorite = { task.favorite }
-                id = { task.id }
-                key = { task.id }
-                message = { task.message }
-                { ...task }
-            />
+            <Catcher key = { task.get('id') }>
+                <Task
+                    actions = { actions }
+                    completed = { task.get('completed') }
+                    favorite = { task.get('favorite') }
+                    id = { task.get('id') }
+                    message = { task.get('message') }
+                    { ...task }
+                />
+            </Catcher>
         ));
 
         return (
