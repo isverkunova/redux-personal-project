@@ -34,17 +34,10 @@ export default class Task extends Component {
     _setEditMode = () => {
         const { isEditing } = this.state;
 
-        console.log('this.state', this.state);
         if (isEditing) {
-            //this._cancelEditing();
-
-            this.setState({ isEditing: false });
-            console.log('if isEditing was TRUE, it should become FALSE', this.state);
+            this._cancelEditing();
         } else {
-            //this._startEditing();
-
-            this.setState({ isEditing: true });
-            console.log('if isEditing was FALSE, it should become TRUE', this.state);
+            this._startEditing();
         }
     };
 
@@ -92,8 +85,23 @@ export default class Task extends Component {
         }));
     };
 
+    _starTask = () => {
+        const { actions, id, completed, favorite } = this.props;
+        const { message } = this.state;
+
+        actions.editTaskAsync({ id, message, completed, favorite: !favorite });
+    };
+
+    _setCompletion = () => {
+        const { actions, id, completed, favorite } = this.props;
+        const { message } = this.state;
+
+        actions.editTaskAsync({ id, message, completed: !completed, favorite });
+    };
+
     render () {
-        const { message, completed, isEditing, favorite } = this.props;
+        const { completed, favorite } = this.props;
+        const { isEditing, message } = this.state;
 
         const styles = cx(Styles.task, {
             [Styles.completed]: completed,
@@ -108,6 +116,7 @@ export default class Task extends Component {
                         className = { Styles.toggleTaskCompletedState }
                         color1 = '#3B8EF3'
                         color2 = '#FFF'
+                        onClick = { this._setCompletion }
                     />
                     <input
                         disabled = { !isEditing }
