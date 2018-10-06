@@ -1,7 +1,7 @@
 // Types
 import { types } from './types';
 
-export const postsActions = {
+export const tasksActions = {
     // Sync
     fillTasks: (tasks) => {
         return {
@@ -21,22 +21,22 @@ export const postsActions = {
             payload: id,
         };
     },
-    starTask: (starredTask) => {
+    editTask: (editedTask) => {
+        return {
+            type:    types.EDIT_TASK,
+            payload: editedTask,
+        };
+    },
+    starTask: (starredTaskData) => {
         return {
             type:    types.STAR_TASK,
-            payload: starredTask,
+            payload: starredTaskData,
         };
     },
     unstarTask: (taskId) => {
         return {
             type:    types.UNSTAR_TASK,
             payload: taskId,
-        };
-    },
-    editTask: (editedTask) => {
-        return {
-            type:    types.EDIT_TASK,
-            payload: editedTask,
         };
     },
 
@@ -58,6 +58,12 @@ export const postsActions = {
             payload: id,
         };
     },
+    editTaskAsync: (taskToEdit) => {
+        return {
+            type:    types.EDIT_TASK_ASYNC,
+            payload: taskToEdit,
+        };
+    },
     starTaskAsync: (taskId) => {
         return {
             type:    types.STAR_TASK_ASYNC,
@@ -68,12 +74,6 @@ export const postsActions = {
         return {
             type:    types.UNSTAR_TASK_ASYNC,
             payload: taskId,
-        };
-    },
-    editTaskAsync: (editedTaskData) => {
-        return {
-            type:    types.EDIT_TASK_ASYNC,
-            payload: editedTaskData,
         };
     },
 };

@@ -11,5 +11,34 @@ export const api = {
                 },
             });
         },
+        create (message) {
+            return fetch(`${MAIN_URL}`, {
+                method:  'POST',
+                headers: {
+                    Authorization:  TOKEN,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message }),
+            });
+        },
+        remove (id) {
+            return fetch(`${MAIN_URL}/${id}`, {
+                method:  'DELETE',
+                headers: {
+                    Authorization:  TOKEN,
+                    'Content-Type': 'application/json',
+                },
+            });
+        },
+        edit (taskToEdit) {
+            return fetch(`${MAIN_URL}`, {
+                method:  'PUT',
+                headers: {
+                    Authorization:  TOKEN,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify([taskToEdit]),
+            });
+        },
     },
 };
