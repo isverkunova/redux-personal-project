@@ -3,10 +3,11 @@ import React, { Component, createRef } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Formik, Form, Field } from 'formik';
+import { Form as RForm, Control } from 'react-redux-form';
 
 // Instruments
 import Styles from './styles.m.css';
-import { scheduler } from '../../core/form/shapes';
+import { scheduler } from '../../core/forms/shapes';
 
 // Components
 import Task from '../Task';
@@ -18,7 +19,8 @@ import { tasksActions } from '../../core/tasks/actions';
 
 const mapState = (state) => {
     return {
-        tasks: state.tasks,
+        tasks:       state.tasks,
+        searchTasks: state.forms.search.message,
     };
 };
 
@@ -93,23 +95,15 @@ export default class Scheduler extends Component {
         return [...priorityTasks, ...defaultTasks, ...completedPriorityTasks, ...completedTasks];
     }
 
-    _search = (event) => {
-        const { value } = event.target;
-        const { tasks } = this.props;
-
-        console.log('value', value);
-        console.log('tasks', tasks);
-
-        const searchedTasks = tasks.filter((task) => task.get('message').includes(value));
-
-        console.log('searchedTasks', searchedTasks);
-    }
-
     render () {
-        const { actions, tasks } = this.props;
+        const { actions, tasks, searchTasks } = this.props;
         const setCompletion = this._setCompletion();
 
-        const todoList = this._sorting(tasks).map((task) => (
+        const searchedTasks = tasks.filter((task) => task.get('message').includes(searchTasks.toLowerCase()));
+
+        const filteredList = searchTasks ? searchedTasks : tasks;
+
+        const todoList = this._sorting(filteredList).map((task) => (
             <Catcher key = { task.get('id') }>
                 <Task
                     actions = { actions }
@@ -123,34 +117,24 @@ export default class Scheduler extends Component {
         ));
 
         return (
-            <Formik
-                initialValues = { scheduler.shape }
-                ref = { this.formikForm }
-                render = { () => {
-                    return (
-                        <section className = { Styles.scheduler }>
-                            <main>
-                                <header>
-                                    <h1>Планировщик задач</h1>
-                                    <form>
-                                        <input
-                                            placeholder = 'Поиск'
-                                            type = 'search'
-                                            onChange = { this._search }
-                                        />
-                                    </form>
-                                    {/* <Form>
-                                        <Field
-                                            maxLength = '50'
-                                            name = 'searchInput'
-                                            placeholder = 'Поиск'
-                                            type = 'search'
-                                            value = { searchText }
-                                            onChange = { this._search }
-                                        />
-                                    </Form> */}
-                                </header>
-                                <section>
+            <section className = { Styles.scheduler }>
+                <main>
+                    <header>
+                        <h1>Планировщик задач</h1>
+                        <RForm className = { Styles.input } model = 'forms.search'>
+                            <Control.text
+                                model = 'forms.search.message'
+                                placeholder = 'Поиск'
+                                type = 'search'
+                            />
+                        </RForm>
+                    </header>
+                    <section>
+                        <Formik
+                            initialValues = { scheduler.shape }
+                            ref = { this.formikForm }
+                            render = { () => {
+                                return (
                                     <Form>
                                         <Field
                                             maxLength = '50'
@@ -159,30 +143,30 @@ export default class Scheduler extends Component {
                                             type = 'text'
                                             onKeyPress = { this._submitFormOnEnter }
                                         />
-                                        <input type = 'submit' value = 'Добавить задачу' />
+                                        <button type = 'submit'>Добавить задачу</button>
                                     </Form>
-                                </section>
-                                <div className = { Styles.overlay }>
-                                    <ul>{todoList}</ul>
-                                </div>
-                                <footer>
-                                    <Checkbox
-                                        checked = { setCompletion }
-                                        color1 = '#363636'
-                                        color2 = '#fff'
-                                        onClick = { this._completeAllTasks }
-                                    />
-                                    <span className = { Styles.completeAllTasks }>
-                                        Все задачи выполнены
-                                    </span>
-                                </footer>
-                            </main>
-                        </section>
-                    );
-                } }
-                validationSchema = { scheduler.schema }
-                onSubmit = { this._submitForm }
-            />
+                                );
+                            } }
+                            validationSchema = { scheduler.schema }
+                            onSubmit = { this._submitForm }
+                        />
+                        <div className = { Styles.overlay }>
+                            <ul>{todoList}</ul>
+                        </div>
+                    </section>
+                    <footer>
+                        <Checkbox
+                            checked = { setCompletion }
+                            color1 = '#363636'
+                            color2 = '#fff'
+                            onClick = { this._completeAllTasks }
+                        />
+                        <span className = { Styles.completeAllTasks }>
+                            Все задачи выполнены
+                        </span>
+                    </footer>
+                </main>
+            </section>
         );
     }
 }
