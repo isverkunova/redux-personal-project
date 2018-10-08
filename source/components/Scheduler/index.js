@@ -7,7 +7,6 @@ import { Formik, Form, Field } from 'formik';
 // Instruments
 import Styles from './styles.m.css';
 import { scheduler } from '../../core/form/shapes';
-// import { tempTasks } from './tasks';
 
 // Components
 import Task from '../Task';
@@ -16,13 +15,10 @@ import Checkbox from '../../theme/assets/Checkbox';
 
 // Actions
 import { tasksActions } from '../../core/tasks/actions';
-// import { taskActions } from '../../core/task/actions';
 
 const mapState = (state) => {
     return {
         tasks: state.tasks,
-        // isEditing:      state.task.get('isEditing'),
-        // updatedMessage: state.task.get('updatedMessage'),
     };
 };
 
@@ -66,25 +62,62 @@ export default class Scheduler extends Component {
         }
     };
 
-    render () {
-        const {
-            actions,
-            tasks,
-            // isEditing,
-            // updatedMessage
-        } = this.props;
+    _setCompletion = () => {
+        const { tasks } = this.props;
 
-        const todoList = tasks.map((task) => (
+        const checkCompletion = tasks.every((task) => task.get('completed'));
+
+        return checkCompletion;
+    }
+
+    _completeAllTasks = () => {
+        if (!this._setCompletion()) {
+            const { tasks, actions } = this.props;
+
+            const taskToComplete = tasks.filter((task) => !task.get('completed'));
+
+            const completedTasks = taskToComplete.map((task) => task.set('completed', true));
+
+            actions.completeAllTasksAsync(completedTasks);
+        } else {
+            return null;
+        }
+    }
+
+    _sorting = (tasks) => {
+        const priorityTasks = tasks.filter((task) => task.get('favorite') && !task.get('completed'));
+        const defaultTasks = tasks.filter((task) => !task.get('favorite') && !task.get('completed'));
+        const completedPriorityTasks = tasks.filter((task) => task.get('favorite') && task.get('completed'));
+        const completedTasks = tasks.filter((task) => !task.get('favorite') && task.get('completed'));
+
+        return [...priorityTasks, ...defaultTasks, ...completedPriorityTasks, ...completedTasks];
+    }
+
+    _search = (event) => {
+        const { value } = event.target;
+        const { tasks } = this.props;
+
+        console.log('value', value);
+        console.log('tasks', tasks);
+
+        const searchedTasks = tasks.filter((task) => task.get('message').includes(value));
+
+        console.log('searchedTasks', searchedTasks);
+    }
+
+    render () {
+        const { actions, tasks } = this.props;
+        const setCompletion = this._setCompletion();
+
+        const todoList = this._sorting(tasks).map((task) => (
             <Catcher key = { task.get('id') }>
                 <Task
                     actions = { actions }
                     completed = { task.get('completed') }
                     favorite = { task.get('favorite') }
                     id = { task.get('id') }
-                    // isEditing = { isEditing }
                     message = { task.get('message') }
                     task = { task }
-                    // updatedMessage = { updatedMessage }
                 />
             </Catcher>
         ));
@@ -99,7 +132,23 @@ export default class Scheduler extends Component {
                             <main>
                                 <header>
                                     <h1>Планировщик задач</h1>
-                                    <input placeholder = 'Поиск' type = 'search' />
+                                    <form>
+                                        <input
+                                            placeholder = 'Поиск'
+                                            type = 'search'
+                                            onChange = { this._search }
+                                        />
+                                    </form>
+                                    {/* <Form>
+                                        <Field
+                                            maxLength = '50'
+                                            name = 'searchInput'
+                                            placeholder = 'Поиск'
+                                            type = 'search'
+                                            value = { searchText }
+                                            onChange = { this._search }
+                                        />
+                                    </Form> */}
                                 </header>
                                 <section>
                                     <Form>
@@ -117,7 +166,12 @@ export default class Scheduler extends Component {
                                     <ul>{todoList}</ul>
                                 </div>
                                 <footer>
-                                    <Checkbox checked color1 = '#363636' color2 = '#fff' />
+                                    <Checkbox
+                                        checked = { setCompletion }
+                                        color1 = '#363636'
+                                        color2 = '#fff'
+                                        onClick = { this._completeAllTasks }
+                                    />
                                     <span className = { Styles.completeAllTasks }>
                                         Все задачи выполнены
                                     </span>

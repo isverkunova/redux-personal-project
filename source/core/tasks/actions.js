@@ -27,16 +27,10 @@ export const tasksActions = {
             payload: editedTask,
         };
     },
-    starTask: (starredTaskData) => {
+    completeAllTasks: (tasks) => {
         return {
-            type:    types.STAR_TASK,
-            payload: starredTaskData,
-        };
-    },
-    unstarTask: (taskId) => {
-        return {
-            type:    types.UNSTAR_TASK,
-            payload: taskId,
+            type:    types.COMPLETE_ALL_TASKS,
+            payload: tasks,
         };
     },
 
@@ -64,16 +58,10 @@ export const tasksActions = {
             payload: taskToEdit,
         };
     },
-    starTaskAsync: (taskId) => {
+    completeAllTasksAsync: (tasks) => {
         return {
-            type:    types.STAR_TASK_ASYNC,
-            payload: taskId,
-        };
-    },
-    unstarTaskAsync: (taskId) => {
-        return {
-            type:    types.UNSTAR_TASK_ASYNC,
-            payload: taskId,
+            type:    types.COMPLETE_ALL_TASKS_ASYNC,
+            payload: tasks,
         };
     },
 };

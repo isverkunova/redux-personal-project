@@ -18,7 +18,15 @@ export const tasksReducer = (state = initialState, action) => {
             return state.filter((task) => task.get('id') !== action.payload);
 
         case types.EDIT_TASK:
-            return state.map((task) => task.get('id') === action.payload.id ? fromJS(action.payload) : task);
+            return state.update(
+                state.findIndex(
+                    (task) => task.get('id') === action.payload[0].id
+                ),
+                (task) => task.merge(action.payload[0])
+            );
+
+        case types.COMPLETE_ALL_TASKS:
+            return fromJS(action.payload);
 
         default:
             return state;

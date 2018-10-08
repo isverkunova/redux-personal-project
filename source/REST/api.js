@@ -40,5 +40,15 @@ export const api = {
                 body: JSON.stringify([taskToEdit]),
             });
         },
+        complete (tasksToEdit) {
+            return fetch(`${MAIN_URL}`, {
+                method:  'PUT',
+                headers: {
+                    Authorization:  TOKEN,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(tasksToEdit),
+            });
+        },
     },
 };
