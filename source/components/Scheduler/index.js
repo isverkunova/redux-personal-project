@@ -49,11 +49,13 @@ export default class Scheduler extends Component {
     };
 
     _createTask = ({ message }) => {
-        if (!message) {
+        const { actions } = this.props;
+
+        if (!message || message.trim() === "") {
             return null;
         }
 
-        this.props.actions.createTaskAsync(message);
+        actions.createTaskAsync(message);
     };
 
     _submitFormOnEnter = (event) => {
@@ -99,7 +101,7 @@ export default class Scheduler extends Component {
         const { actions, tasks, searchTasks } = this.props;
         const setCompletion = this._setCompletion();
 
-        const searchedTasks = tasks.filter((task) => task.get('message').includes(searchTasks.toLowerCase()));
+        const searchedTasks = tasks.filter((task) => task.get('message').toLowerCase().includes(searchTasks.toLowerCase()));
 
         const filteredList = searchTasks ? searchedTasks : tasks;
 
@@ -120,11 +122,11 @@ export default class Scheduler extends Component {
             <section className = { Styles.scheduler }>
                 <main>
                     <header>
-                        <h1>Планировщик задач</h1>
+                        <h1>To Do</h1>
                         <RForm className = { Styles.input } model = 'forms.search'>
                             <Control.text
                                 model = 'forms.search.message'
-                                placeholder = 'Поиск'
+                                placeholder = 'Search'
                                 type = 'search'
                             />
                         </RForm>
@@ -139,11 +141,11 @@ export default class Scheduler extends Component {
                                         <Field
                                             maxLength = '50'
                                             name = 'message'
-                                            placeholder = 'Описание моей новой задачи'
+                                            placeholder = 'Description of my new task'
                                             type = 'text'
                                             onKeyPress = { this._submitFormOnEnter }
                                         />
-                                        <button type = 'submit'>Добавить задачу</button>
+                                        <button type = 'submit'>Add new task</button>
                                     </Form>
                                 );
                             } }
@@ -162,7 +164,7 @@ export default class Scheduler extends Component {
                             onClick = { this._completeAllTasks }
                         />
                         <span className = { Styles.completeAllTasks }>
-                            Все задачи выполнены
+                            All tasks completed
                         </span>
                     </footer>
                 </main>
